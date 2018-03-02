@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NewDishActivity"></activity>
         <activity android:name=".RecipeActivity"></activity>
         <activity android:name=".GroceriesActivity"></activity>
         <activity android:name=".MealsActivity"></activity>
