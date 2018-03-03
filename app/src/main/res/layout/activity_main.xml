@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_screen"
     tools:context="edu.sjsu.yitong.wfdapp.MainActivity">
 
     <TableRow>
@@ -42,7 +43,7 @@
                     android:textStyle="bold"
                     android:textSize="25dp"
                     android:gravity="center"
-                    android:text="Meal"/>
+                    android:text="@string/meal_text"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -60,7 +61,7 @@
                     android:textStyle="bold"
                     android:textSize="25dp"
                     android:gravity="center"
-                    android:text="Recipe"/>
+                    android:text="@string/recipe_text"/>
             </LinearLayout>
         </LinearLayout>
     </TableRow>
@@ -87,7 +88,7 @@
                     android:textStyle="bold"
                     android:textSize="25dp"
                     android:gravity="center"
-                    android:text="Grocery"/>
+                    android:text="@string/grocery_text"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -105,7 +106,7 @@
                     android:textStyle="bold"
                     android:textSize="25dp"
                     android:gravity="center"
-                    android:text="New Dish"/>
+                    android:text="@string/new_dish_text"/>
             </LinearLayout>
         </LinearLayout>
     </TableRow>
