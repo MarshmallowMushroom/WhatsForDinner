@@ -2,7 +2,7 @@
     <string name="app_name">WfdApp</string>
     <string name="author">Yitong Luo</string>
     <string name="software_version">1.0</string>
-    <string name="help_url">help url</string>
+    <string name="help_url">https://github.com/MarshmallowMushroom/WhatsForDinner/blob/master/ReadMe.md</string>
     <string name="license">GNU</string>
     <string name="title_activity_main">Main Screen</string>
     <string name="meal_text">Meal</string>
