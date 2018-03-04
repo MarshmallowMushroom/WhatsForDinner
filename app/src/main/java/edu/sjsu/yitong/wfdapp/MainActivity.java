@@ -1,18 +1,14 @@
 package edu.sjsu.yitong.wfdapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.view.ViewGroup.LayoutParams;
@@ -42,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     /** Called when the user taps the Meal button */
     public void viewAppInfo(View view) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View customView = inflater.inflate(R.layout.app_info,null);
+        View customView = inflater.inflate(R.layout.activity_app_info,null);
         mPopupWindow = new PopupWindow(
                 customView,
                 LayoutParams.WRAP_CONTENT,
@@ -58,4 +54,16 @@ public class MainActivity extends AppCompatActivity {
         mPopupWindow.showAtLocation(mTableLayout, Gravity.CENTER,0,0);
         // Do something in response to button
     }
+
+//    final ImageView mealButton = findViewById(R.id.meal);
+//
+//    mealButton.setOnClickListener(new View.onClickListner() {
+//        public void onClick(View v) {
+//
+//        }
+//    });
+
+
+
+
 }

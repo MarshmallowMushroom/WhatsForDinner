@@ -8,6 +8,9 @@ import android.os.Bundle;
  */
 
 public class NewDishActivity extends Activity {
+    // hardcode array of strings
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
