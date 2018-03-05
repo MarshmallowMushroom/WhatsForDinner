@@ -1,6 +1,7 @@
 package edu.sjsu.yitong.wfdapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -33,6 +34,39 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final ImageView mealButton = findViewById(R.id.meal);
+        mealButton.setClickable(true);
+        mealButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MealsActivity.class));
+            }
+        });
+
+        final ImageView recipeButton = findViewById(R.id.recipe);
+        recipeButton.setClickable(true);
+        recipeButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), RecipeActivity.class));
+            }
+        });
+
+        final ImageView groceryButton = findViewById(R.id.grocery);
+        groceryButton.setClickable(true);
+        groceryButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), GroceriesActivity.class));
+
+            }
+        });
+
+        final ImageView newDishButton = findViewById(R.id.newDish);
+        newDishButton.setClickable(true);
+        newDishButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), NewDishActivity.class));
+            }
+        });
+
     }
 
     /** Called when the user taps the Meal button */
@@ -54,16 +88,6 @@ public class MainActivity extends AppCompatActivity {
         mPopupWindow.showAtLocation(mTableLayout, Gravity.CENTER,0,0);
         // Do something in response to button
     }
-
-//    final ImageView mealButton = findViewById(R.id.meal);
-//
-//    mealButton.setOnClickListener(new View.onClickListner() {
-//        public void onClick(View v) {
-//
-//        }
-//    });
-
-
 
 
 }

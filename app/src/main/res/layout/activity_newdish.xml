@@ -2,32 +2,124 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/recipeName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
         android:hint="Enter Recipe Name"
-        android:inputType="text"/>
+        android:background="#00000000"
+        android:inputType="text"
+        />
 
 
     <ImageButton
         android:id="@+id/add_recipe_btn"
         android:layout_width="74dp"
         android:layout_height="78dp"
+        android:layout_alignParentRight="true"
+        android:background="#00000000"
         android:scaleType="fitCenter"
+        android:layout_gravity="right"
+        android:layout_marginRight="10dp"
         android:src="@drawable/add_recipe" />
-    <ListView
+
+
+    <LinearLayout
+        android:id="@+id/recipeGroup"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:drawSelectorOnTop="true"
-            android:entries="@array/array_name"
+        android:layout_height="367dp"
+        android:orientation="vertical"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView1"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+
             />
-    </ListView>
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView2"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView3"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView4"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView5"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView6"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView7"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView8"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView9"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView10"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:dropDownHeight="100dp"
+            android:ems="15"
+            />
+    </LinearLayout>
+    <EditText
+        android:id="@+id/directions"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Enter Cooking Directions Here"
+        android:background="#00000000"
+        android:maxLength="250"
+        android:inputType="text"
+        />
+    <Button
+        android:id="@+id/save_new_dish"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Save"
+        />
+
 </LinearLayout>

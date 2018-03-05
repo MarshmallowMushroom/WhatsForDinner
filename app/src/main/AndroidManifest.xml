@@ -11,8 +11,7 @@
         android:theme="@style/AppTheme">
 
         <!--Main Activity class-->
-        <!--<activity android:name=".MainActivity">-->
-        <activity android:name=".NewDishActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".AppInfoActivity"></activity>
-
+        <activity android:name=".NewDishActivity"></activity>
         <activity android:name=".RecipeActivity"></activity>
         <activity android:name=".GroceriesActivity"></activity>
         <activity android:name=".MealsActivity"></activity>
