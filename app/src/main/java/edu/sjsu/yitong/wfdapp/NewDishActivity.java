@@ -2,15 +2,23 @@ package edu.sjsu.yitong.wfdapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -33,6 +41,9 @@ public class NewDishActivity extends Activity {
     String ingredientFile = "new_dish_activity_ingredients.txt";
     String recipeFile = "new_dish_activity_recipes.txt";
     Map<String, Recipe> recipes = new HashMap<>();
+    Uri imgURI = Uri.parse("android.resource://edu.sjsu.yitong.wfdapp/drawable/default_food");
+
+    private int PICK_IMAGE_REQUEST = 1;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -41,47 +52,84 @@ public class NewDishActivity extends Activity {
         setContentView(R.layout.activity_newdish);
         final ArrayList<String> ingredients = readIngredientsFromFile();
         recipes = readRecipesFromFile();
-//        autoComplete1 = findViewById(R.id.autoCompleteTextView1);
-        final ViewGroup viewGroup = (ViewGroup) findViewById(R.id.recipeGroup);
+        final ViewGroup viewGroup = findViewById(R.id.recipeGroup);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, ingredients);
-//        autoComplete1.setAdapter(adapter);
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
             AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
             childView.setAdapter(adapter);
+            childView.setThreshold(1);
         }
         final EditText recipeName = findViewById(R.id.recipeName);
         final EditText cookingDirection = findViewById(R.id.directions);
+        setRecipeImage(imgURI);
+
+        ImageButton addImagebtn = findViewById(R.id.add_recipe_btn);
+        addImagebtn.setOnClickListener(new ImageButton.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+            }
+        });
+
+
 
         Button button = findViewById(R.id.save_new_dish);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<String> ingredientList = new ArrayList<>();
-                //save ingredients
-                // for loop
-
-                for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                    AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
-                    String ingredient = childView.getText().toString();
-                    if (!ingredients.contains(ingredient)) {
-                        ingredients.add(ingredient);
-                        saveIngredientsToFile(ingredients);
-                    }
-                    if (!ingredientList.contains(ingredient)) {
-                        ingredientList.add(ingredient);
-                    }
+                String recipeText = recipeName.getText().toString().toLowerCase();
+                if (recipes.containsKey(recipeText)) {
+                    Toast.makeText(getApplicationContext(), "Recipe name already exists", Toast.LENGTH_LONG).show();
+                    return;
                 }
 
+                ArrayList<String> ingredientList = new ArrayList<>();
+                for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                    AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
+                    String ingredient = childView.getText().toString().toLowerCase();
+                    if (!ingredients.contains(ingredient)) {
+                        ingredients.add(ingredient);
+                    }
+                    ingredientList.add(ingredient);
+                }
+                //save all new ingredients
+                saveIngredientsToFile(ingredients);
                 //save recipe object
-                String recipeText = recipeName.getText().toString();
                 String directionText = cookingDirection.getText().toString();
-                Recipe newRecipe = new Recipe(recipeText, ingredientList, directionText);
+                Recipe newRecipe = new Recipe(recipeText, imgURI, ingredientList, directionText);
                 if (!recipes.containsKey(recipeText)) {
                     recipes.put(recipeText, newRecipe);
                     saveRecipeToFile(recipes);
                 }
+                Toast.makeText(getApplicationContext(), "Recipe Saved Successfully", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri uri = data.getData();
+            setRecipeImage(uri);
+        }
+    }
+
+    private void setRecipeImage(Uri uri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            // Log.d(TAG, String.valueOf(bitmap));
+
+            ImageView imageView = findViewById(R.id.recipe_img);
+            imageView.setImageBitmap(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Map<String, Recipe> readRecipesFromFile() {
