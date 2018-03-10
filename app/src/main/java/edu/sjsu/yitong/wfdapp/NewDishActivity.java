@@ -1,14 +1,17 @@
 package edu.sjsu.yitong.wfdapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -17,18 +20,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +40,7 @@ public class NewDishActivity extends Activity {
     protected List<String> ingredients = new ArrayList<>();
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-
+        final Context context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newdish);
         // get ingredients from recipes
@@ -70,14 +66,50 @@ public class NewDishActivity extends Activity {
         addImagebtn.setOnClickListener(new ImageButton.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+                LayoutInflater li = LayoutInflater.from(context);
+                View promptsView = li.inflate(R.layout.activity_new_dish_img_select, null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                alertDialogBuilder.setView(promptsView);
+                final EditText userInput = (EditText) promptsView.findViewById(R.id.imageUrlInput);
+
+                // set title
+                alertDialogBuilder.setTitle("Choose Image");
+
+                alertDialogBuilder
+                        .setMessage("Choose Image file")
+                        .setCancelable(false)
+                        .setPositiveButton("Local File", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent();
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+                            }
+                        })
+                        .setNegativeButton("Use URL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                try {
+                                    URL url = new URL(userInput.getText().toString());
+                                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                                    StrictMode.setThreadPolicy(policy);
+                                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                    ImageView imageView = findViewById(R.id.recipe_img);
+                                    imageView.setImageBitmap(bmp);
+                                    imgURI = Uri.parse(url.toString());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    Toast.makeText(getApplicationContext(), "Invalid URL Input, try again", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                dialogInterface.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         });
-
-
 
         Button button = findViewById(R.id.save_new_dish);
         button.setOnClickListener(new View.OnClickListener() {
