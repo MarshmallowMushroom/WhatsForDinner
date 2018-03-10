@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -37,21 +38,23 @@ import java.util.Map;
  */
 
 public class NewDishActivity extends Activity {
-
-    String ingredientFile = "new_dish_activity_ingredients.txt";
-    String recipeFile = "new_dish_activity_recipes.txt";
-    Map<String, Recipe> recipes = new HashMap<>();
     Uri imgURI = Uri.parse("android.resource://edu.sjsu.yitong.wfdapp/drawable/default_food");
 
     private int PICK_IMAGE_REQUEST = 1;
-
+    protected List<String> ingredients = new ArrayList<>();
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newdish);
-        final ArrayList<String> ingredients = readIngredientsFromFile();
-        recipes = readRecipesFromFile();
+        // get ingredients from recipes
+        for (Map.Entry<String,Recipe> entry : SharedRecipes.recipes.entrySet()) {
+            for (String i : entry.getValue().ingredients) {
+                if (!ingredients.contains(i)) {
+                    ingredients.add(i);
+                }
+            }
+        }
         final ViewGroup viewGroup = findViewById(R.id.recipeGroup);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, ingredients);
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
@@ -80,30 +83,25 @@ public class NewDishActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String recipeText = recipeName.getText().toString().toLowerCase();
-                if (recipes.containsKey(recipeText)) {
+                String name = recipeName.getText().toString().toLowerCase();
+                if (SharedRecipes.recipes.containsKey(name)) {
                     Toast.makeText(getApplicationContext(), "Recipe name already exists", Toast.LENGTH_LONG).show();
                     return;
                 }
 
-                ArrayList<String> ingredientList = new ArrayList<>();
+                ArrayList<String> recipeIngredientList = new ArrayList<>();
                 for (int i = 0; i < viewGroup.getChildCount(); i++) {
                     AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
                     String ingredient = childView.getText().toString().toLowerCase();
                     if (!ingredients.contains(ingredient)) {
                         ingredients.add(ingredient);
                     }
-                    ingredientList.add(ingredient);
+                    recipeIngredientList.add(ingredient);
                 }
-                //save all new ingredients
-                saveIngredientsToFile(ingredients);
                 //save recipe object
                 String directionText = cookingDirection.getText().toString();
-                Recipe newRecipe = new Recipe(recipeText, imgURI, ingredientList, directionText);
-                if (!recipes.containsKey(recipeText)) {
-                    recipes.put(recipeText, newRecipe);
-                    saveRecipeToFile(recipes);
-                }
+                Recipe newRecipe = new Recipe(name, imgURI, recipeIngredientList, directionText);
+                SharedRecipes.recipes.put(name, newRecipe);
                 Toast.makeText(getApplicationContext(), "Recipe Saved Successfully", Toast.LENGTH_LONG).show();
             }
         });
@@ -123,68 +121,10 @@ public class NewDishActivity extends Activity {
     private void setRecipeImage(Uri uri) {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-            // Log.d(TAG, String.valueOf(bitmap));
-
             ImageView imageView = findViewById(R.id.recipe_img);
             imageView.setImageBitmap(bitmap);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private Map<String, Recipe> readRecipesFromFile() {
-        Map<String, Recipe> savedRecipe = new HashMap<>();
-        try {
-            FileInputStream inputStream = openFileInput(recipeFile);
-            ObjectInputStream in = new ObjectInputStream(inputStream);
-            savedRecipe = (Map<String, Recipe>) in.readObject();
-            in.close();
-            inputStream.close();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return savedRecipe;
-    }
-
-    private void saveRecipeToFile(Map<String, Recipe> recipes) {
-        try {
-            FileOutputStream s = openFileOutput(recipeFile, Context.MODE_PRIVATE);
-            ObjectOutputStream out = new ObjectOutputStream(s);
-            out.writeObject(recipes);
-            out.close();
-            s.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveIngredientsToFile(ArrayList<String> ingredients) {
-        try {
-            FileOutputStream s = openFileOutput(ingredientFile, Context.MODE_PRIVATE);
-            ObjectOutputStream out = new ObjectOutputStream(s);
-            out.writeObject(ingredients);
-            out.close();
-            s.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private ArrayList<String> readIngredientsFromFile() {
-        ArrayList<String> savedArrayList = new ArrayList<>();
-
-        try {
-            FileInputStream inputStream = openFileInput(ingredientFile);
-            ObjectInputStream in = new ObjectInputStream(inputStream);
-            savedArrayList = (ArrayList<String>) in.readObject();
-            in.close();
-            inputStream.close();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return savedArrayList;
     }
 }

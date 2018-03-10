@@ -15,25 +15,35 @@ import android.widget.PopupWindow;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TableLayout;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
     private ImageView logo = null;
     private Context mContext;
     private PopupWindow mPopupWindow;
     private TableLayout mTableLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
-        mTableLayout = (TableLayout) findViewById(R.id.main_screen);
+        mTableLayout = findViewById(R.id.main_screen);
 
-        logo = (ImageView)findViewById(R.id.wfdlogo);
+        logo = findViewById(R.id.wfdlogo);
         logo.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
                 viewAppInfo(view);
             }
         });
 
+        SharedRecipes.recipes = readRecipesFromFile();
         final ImageView mealButton = findViewById(R.id.meal);
         mealButton.setClickable(true);
         mealButton.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +76,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), NewDishActivity.class));
             }
         });
+    }
 
+    @Override
+    protected void onPause(){
+        saveRecipeToFile(SharedRecipes.recipes);
+        super.onPause();
     }
 
     /** Called when the user taps the Meal button */
@@ -89,5 +104,30 @@ public class MainActivity extends AppCompatActivity {
         // Do something in response to button
     }
 
+    private Map<String, Recipe> readRecipesFromFile() {
+        Map<String, Recipe> savedRecipe = new HashMap<>();
+        try {
+            FileInputStream inputStream = openFileInput(SharedRecipes.recipeFile);
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+            savedRecipe = (Map<String, Recipe>) in.readObject();
+            in.close();
+            inputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        return savedRecipe;
+    }
+
+    private void saveRecipeToFile(Map<String, Recipe> recipes) {
+        try {
+            FileOutputStream s = openFileOutput(SharedRecipes.recipeFile, Context.MODE_PRIVATE);
+            ObjectOutputStream out = new ObjectOutputStream(s);
+            out.writeObject(recipes);
+            out.close();
+            s.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
