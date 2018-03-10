@@ -1,18 +1,31 @@
 package edu.sjsu.yitong.wfdapp;
 
 import android.app.Fragment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by yitong on 3/6/18.
  */
 
 public class RecipeDetailFragment extends Fragment {
-    protected Recipe mRecipe;
+    protected String recipeName;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -25,34 +38,52 @@ public class RecipeDetailFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mRecipe = (Recipe) savedInstanceState.getSerializable("curID");
+            recipeName =  savedInstanceState.getString("curID");
         }
 
         if (this.getActivity().getIntent() != null) {
-            Recipe r = (Recipe) this.getActivity().getIntent().getSerializableExtra("curID");
+            String r = (String) this.getActivity().getIntent().getStringExtra("curID");
 
             if (r != null) {
-                mRecipe = r;
+                recipeName = r;
             }
         }
 
-        if (mRecipe != null) {
-            load(mRecipe);
+        if (recipeName != null) {
+            setDetails(recipeName);
         }
     }
 
-    public void load(Recipe recipe) {
-        mRecipe = recipe;
-
-        if (recipe != null) {
-            // load views with Buzz object data
-            setText(recipe.name);
-        }
-    }
-
-    public void setText(String text) {
+    public void setDetails(String name) {
+        Recipe recipe = SharedRecipes.recipes.get(name);
         TextView view = getView().findViewById(R.id.recipeDetailName);
-        view.setText(text);
-    }
+        view.setText(name);
 
+        ImageView imageView = getView().findViewById(R.id.recipeDetailImage);
+        if (recipe.imageURL == null) { // if image is from local file
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), recipe.imageURI);
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                Bitmap bmp = BitmapFactory.decodeStream(recipe.imageURL.openConnection().getInputStream());
+                imageView.setImageBitmap(bmp);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        ListView lv = getView().findViewById(R.id.recipeDetailIngredientList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getView().getContext(), android.R.layout.simple_list_item_1, recipe.ingredients);
+        lv.setAdapter(adapter);
+
+        TextView directions = getView().findViewById(R.id.recipeDetailCookingDirection);
+        directions.setText(recipe.cookingDirection);
+    }
 }

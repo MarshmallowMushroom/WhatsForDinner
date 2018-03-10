@@ -10,4 +10,5 @@ import java.util.Map;
 public class SharedRecipes {
     public static String recipeFile = "new_dish_activity_recipes.txt";
     public static Map<String, Recipe> recipes = new HashMap<>();
+    public static Map<String, Integer> meals = new HashMap<>();
 }

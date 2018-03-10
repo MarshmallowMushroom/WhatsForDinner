@@ -7,6 +7,7 @@
     >
     <TextView
         android:layout_height="wrap_content"
+        android:id="@+id/recipeTitleWithCount"
         android:text="Recipe"
         android:textSize="30dp"
         android:gravity="center"

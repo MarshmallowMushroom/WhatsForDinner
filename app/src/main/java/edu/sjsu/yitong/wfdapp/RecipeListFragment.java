@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,12 +28,9 @@ public class RecipeListFragment extends Fragment implements AdapterView.OnItemCl
     protected ListView mListView;
     protected Boolean mDualPane;
 
-    Map<String, Recipe> recipes = new HashMap();
-    ArrayList<String> recipeNames = new ArrayList<>();
-    String recipeFile = "new_dish_activity_recipes.txt";
+    List<String> recipeNames = new ArrayList<>();
+    int mealCount = 0;
 
-    // a bundle object we want to retain
-//    private Bundle mydata;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         // Defines the xml file for the fragment
@@ -45,12 +44,15 @@ public class RecipeListFragment extends Fragment implements AdapterView.OnItemCl
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        recipes = readRecipesFromFile();
+        for (String key : SharedRecipes.meals.keySet()) {
+            mealCount += SharedRecipes.meals.get(key);
+        }
+        TextView t = getView().findViewById(R.id.recipeTitleWithCount);
+        t.setText("Recipe (" + mealCount + " Meal(s))");
 
-        for (String key : recipes.keySet()) {
+        for (String key : SharedRecipes.recipes.keySet()) {
             recipeNames.add(key);
         }
-
         this.mListView = getActivity().findViewById(R.id.listNames);
 
         if (this.mListView != null) {
@@ -88,16 +90,15 @@ public class RecipeListFragment extends Fragment implements AdapterView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> l, View v, int position, long id) {
         if (position < recipeNames.size()) {
-            // get matching recipe id from position
-            String buzzId = recipeNames.get(position);
-            showDetails(buzzId);
+            String recipeId = recipeNames.get(position);
+            showDetails(recipeId);
         }
     }
 
     public void showDetails(String id) {
-        if (id != null && !id.isEmpty() && recipes != null && !recipes.isEmpty()) {
+        if (id != null && !id.isEmpty() && SharedRecipes.recipes != null && !SharedRecipes.recipes.isEmpty()) {
             // find Recipe object
-            Recipe currRecipe = recipes.get(id);
+            Recipe currRecipe = SharedRecipes.recipes.get(id);
 
             if (currRecipe != null) {
                 mCurrentId = currRecipe.name;
@@ -112,44 +113,18 @@ public class RecipeListFragment extends Fragment implements AdapterView.OnItemCl
                 // load item
                 if (mDualPane) {
                     RecipeDetailFragment details = (RecipeDetailFragment) getFragmentManager().findFragmentById(R.id.recipeDetail);
-                    details.load(currRecipe);
+                    details.setDetails(currRecipe.name);
                 } else {
-                    Toast.makeText(getActivity(), "singlepane", Toast.LENGTH_LONG).show();
-                    // launch new activity because we're in single mode pane
-//                    Intent showContent = new Intent(getActivity(), HoneybuzzDetailsActivity.class);
-//                    showContent.putExtra(HoneybuzzDetailsActivity.EXTRA_BUZZ, buzz);
-//                    startActivity(showContent);
+                    if (SharedRecipes.meals.containsKey(id)) {
+                        SharedRecipes.meals.put(id, SharedRecipes.meals.get(id) + 1);
+                    } else {
+                        SharedRecipes.meals.put(id, 1);
+                    }
+                    mealCount++;
+                    TextView t = getView().findViewById(R.id.recipeTitleWithCount);
+                    t.setText("Recipe (" + mealCount + " Meal(s))");
                 }
             }
         }
     }
-
-    private Map<String, Recipe> readRecipesFromFile() {
-        Map<String, Recipe> savedRecipe = new HashMap<>();
-        try {
-            FileInputStream inputStream = getActivity().openFileInput(recipeFile);
-            ObjectInputStream in = new ObjectInputStream(inputStream);
-            savedRecipe = (Map<String, Recipe>) in.readObject();
-            in.close();
-            inputStream.close();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return savedRecipe;
-    }
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        // set the retain instance flag
-//        setRetainInstance(true);
-//    }
-//
-//    public void setBundle(Bundle data) {
-//        this.mydata = data;
-//    }
-//
-//    public Bundle getBundle() {
-//        return mydata;
-//    }
 }

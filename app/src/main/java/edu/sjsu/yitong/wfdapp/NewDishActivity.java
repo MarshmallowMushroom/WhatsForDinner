@@ -35,6 +35,7 @@ import java.util.Map;
 
 public class NewDishActivity extends Activity {
     Uri imgURI = Uri.parse("android.resource://edu.sjsu.yitong.wfdapp/drawable/default_food");
+    URL imgURL = null;
 
     private int PICK_IMAGE_REQUEST = 1;
     protected List<String> ingredients = new ArrayList<>();
@@ -91,13 +92,12 @@ public class NewDishActivity extends Activity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 try {
-                                    URL url = new URL(userInput.getText().toString());
+                                    imgURL = new URL(userInput.getText().toString());
                                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                                     StrictMode.setThreadPolicy(policy);
-                                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                    Bitmap bmp = BitmapFactory.decodeStream(imgURL.openConnection().getInputStream());
                                     ImageView imageView = findViewById(R.id.recipe_img);
                                     imageView.setImageBitmap(bmp);
-                                    imgURI = Uri.parse(url.toString());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getApplicationContext(), "Invalid URL Input, try again", Toast.LENGTH_LONG).show();
@@ -132,7 +132,7 @@ public class NewDishActivity extends Activity {
                 }
                 //save recipe object
                 String directionText = cookingDirection.getText().toString();
-                Recipe newRecipe = new Recipe(name, imgURI, recipeIngredientList, directionText);
+                Recipe newRecipe = new Recipe(name, imgURI, imgURL, recipeIngredientList, directionText);
                 SharedRecipes.recipes.put(name, newRecipe);
                 Toast.makeText(getApplicationContext(), "Recipe Saved Successfully", Toast.LENGTH_LONG).show();
             }
@@ -150,7 +150,7 @@ public class NewDishActivity extends Activity {
         }
     }
 
-    private void setRecipeImage(Uri uri) {
+    public void setRecipeImage(Uri uri) {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
             ImageView imageView = findViewById(R.id.recipe_img);
