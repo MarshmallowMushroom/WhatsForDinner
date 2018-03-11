@@ -7,8 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.MediaStore;
@@ -33,8 +33,9 @@ import java.util.Map;
  * Created by yitong on 2/17/18.
  */
 
-public class NewDishActivity extends Activity {
-    Uri imgURI = Uri.parse("android.resource://edu.sjsu.yitong.wfdapp/drawable/default_food");
+public class EditRecipeActivity extends Activity {
+
+    Recipe r = null;
     Bitmap bitmap = null;
 
     private int PICK_IMAGE_REQUEST = 1;
@@ -44,6 +45,8 @@ public class NewDishActivity extends Activity {
         final Context context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newdish);
+        String id = getIntent().getExtras().getString("recipeID");
+
         // get ingredients from recipes
         for (Map.Entry<String,Recipe> entry : SharedRecipes.recipes.entrySet()) {
             for (String i : entry.getValue().ingredients) {
@@ -52,16 +55,28 @@ public class NewDishActivity extends Activity {
                 }
             }
         }
+
+        r = SharedRecipes.recipes.get(id);
+        int s = 0;
         final ViewGroup viewGroup = findViewById(R.id.recipeGroup);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, ingredients);
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
             AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
             childView.setAdapter(adapter);
             childView.setThreshold(1);
+            if (s < r.ingredients.size()) {
+                childView.setText(r.ingredients.get(s));
+                s++;
+            }
+
         }
         final EditText recipeName = findViewById(R.id.recipeName);
+        recipeName.setText(r.name);
         final EditText cookingDirection = findViewById(R.id.directions);
-        setRecipeImage(imgURI);
+        cookingDirection.setText(r.cookingDirection);
+
+        ImageView imageView = findViewById(R.id.recipe_img);
+        imageView.setImageBitmap(r.bitmap.bitmap);
 
         ImageButton addImagebtn = findViewById(R.id.add_recipe_btn);
         addImagebtn.setOnClickListener(new ImageButton.OnClickListener(){
@@ -101,7 +116,6 @@ public class NewDishActivity extends Activity {
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getApplicationContext(), "Invalid URL Input, try again", Toast.LENGTH_LONG).show();
-                                    return;
                                 }
                                 dialogInterface.cancel();
                             }
@@ -115,12 +129,6 @@ public class NewDishActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = recipeName.getText().toString().toLowerCase();
-                if (SharedRecipes.recipes.containsKey(name)) {
-                    Toast.makeText(getApplicationContext(), "Recipe name already exists", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
                 ArrayList<String> recipeIngredientList = new ArrayList<>();
                 for (int i = 0; i < viewGroup.getChildCount(); i++) {
                     AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
@@ -130,13 +138,10 @@ public class NewDishActivity extends Activity {
                     }
                     recipeIngredientList.add(ingredient);
                 }
+                //save recipe object
                 String directionText = cookingDirection.getText().toString();
-                if (bitmap == null) {
-                    ImageView image = findViewById(R.id.recipe_img);
-                    bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();
-                }
-                Recipe newRecipe = new Recipe(name, bitmap, recipeIngredientList, directionText);
-                SharedRecipes.recipes.put(name, newRecipe);
+                Recipe newRecipe = new Recipe(r.name, bitmap, recipeIngredientList, directionText);
+                SharedRecipes.recipes.put(r.name, newRecipe);
                 Toast.makeText(getApplicationContext(), "Recipe Saved Successfully", Toast.LENGTH_LONG).show();
             }
         });
@@ -147,13 +152,13 @@ public class NewDishActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
             Uri uri = data.getData();
             setRecipeImage(uri);
-            imgURI = uri;
         }
     }
 
-    public void setRecipeImage(Uri uri) {
+    public void setRecipeImage(Uri uri) {;
         try {
             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
             ImageView imageView = findViewById(R.id.recipe_img);

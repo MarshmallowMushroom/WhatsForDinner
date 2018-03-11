@@ -1,6 +1,7 @@
 package edu.sjsu.yitong.wfdapp;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +24,7 @@ import java.util.Map;
  * Created by yitong on 3/6/18.
  */
 
-public class RecipeListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class RecipeListFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     protected String mCurrentId;
     protected ListView mListView;
     protected Boolean mDualPane;
@@ -57,6 +58,7 @@ public class RecipeListFragment extends Fragment implements AdapterView.OnItemCl
 
         if (this.mListView != null) {
             this.mListView.setOnItemClickListener(this);
+            this.mListView.setOnItemLongClickListener(this);
             this.mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, recipeNames);
             this.mListView.setAdapter(adapter);
@@ -93,6 +95,23 @@ public class RecipeListFragment extends Fragment implements AdapterView.OnItemCl
             String recipeId = recipeNames.get(position);
             showDetails(recipeId);
         }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id){
+        if (position < recipeNames.size()) {
+            String recipeId = recipeNames.get(position);
+            showEditFragment(recipeId);
+        }
+        return true;
+    }
+
+    public void showEditFragment(String id) {
+        Intent intent  = new Intent(getActivity(), EditRecipeActivity.class);
+        Bundle b = new Bundle();
+        b.putString("recipeID", id);
+        intent.putExtras(b);
+        startActivity(intent);
     }
 
     public void showDetails(String id) {

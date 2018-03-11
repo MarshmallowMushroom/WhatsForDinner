@@ -60,24 +60,7 @@ public class RecipeDetailFragment extends Fragment {
         view.setText(name);
 
         ImageView imageView = getView().findViewById(R.id.recipeDetailImage);
-        if (recipe.imageURL == null) { // if image is from local file
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), recipe.imageURI);
-                imageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-                Bitmap bmp = BitmapFactory.decodeStream(recipe.imageURL.openConnection().getInputStream());
-                imageView.setImageBitmap(bmp);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
+        imageView.setImageBitmap(recipe.bitmap.bitmap);
 
         ListView lv = getView().findViewById(R.id.recipeDetailIngredientList);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getView().getContext(), android.R.layout.simple_list_item_1, recipe.ingredients);
