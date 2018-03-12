@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         SharedRecipes.recipes = readRecipesFromFile();
+        SharedRecipes.meals = readMealsFromFile();
         final ImageView mealButton = findViewById(R.id.meal);
         mealButton.setClickable(true);
         mealButton.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         saveRecipeToFile(SharedRecipes.recipes);
+        saveMealsToFile(SharedRecipes.meals);
         super.onPause();
     }
 
@@ -146,11 +148,38 @@ public class MainActivity extends AppCompatActivity {
         return savedRecipe;
     }
 
+    private Map<String, Integer> readMealsFromFile() {
+        Map<String, Integer> savedMeals = new HashMap<>();
+        try {
+            FileInputStream inputStream = openFileInput(SharedRecipes.mealsFile);
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+            savedMeals = (Map<String, Integer>) in.readObject();
+            in.close();
+            inputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return savedMeals;
+    }
+
     private void saveRecipeToFile(Map<String, Recipe> recipes) {
         try {
             FileOutputStream s = openFileOutput(SharedRecipes.recipeFile, Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(s);
             out.writeObject(recipes);
+            out.close();
+            s.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveMealsToFile(Map<String, Integer> meals) {
+        try {
+            FileOutputStream s = openFileOutput(SharedRecipes.mealsFile, Context.MODE_PRIVATE);
+            ObjectOutputStream out = new ObjectOutputStream(s);
+            out.writeObject(meals);
             out.close();
             s.close();
         } catch (IOException e) {

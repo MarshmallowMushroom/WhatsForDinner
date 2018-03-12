@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yitong on 3/6/18.
@@ -63,7 +65,11 @@ public class RecipeDetailFragment extends Fragment {
         imageView.setImageBitmap(recipe.bitmap.bitmap);
 
         ListView lv = getView().findViewById(R.id.recipeDetailIngredientList);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getView().getContext(), android.R.layout.simple_list_item_1, recipe.ingredients);
+        List<String> list = new ArrayList<>();
+        for (Ingredient i :recipe.ingredients) {
+            list.add(i.name + " (" + i.amount + " " + i.unit + ")");
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getView().getContext(), android.R.layout.simple_list_item_1, list);
         lv.setAdapter(adapter);
 
         TextView directions = getView().findViewById(R.id.recipeDetailCookingDirection);

@@ -49,9 +49,9 @@ public class EditRecipeActivity extends Activity {
 
         // get ingredients from recipes
         for (Map.Entry<String,Recipe> entry : SharedRecipes.recipes.entrySet()) {
-            for (String i : entry.getValue().ingredients) {
-                if (!ingredients.contains(i)) {
-                    ingredients.add(i);
+            for (Ingredient i : entry.getValue().ingredients) {
+                if (!ingredients.contains(i.name)) {
+                    ingredients.add(i.name);
                 }
             }
         }
@@ -65,7 +65,7 @@ public class EditRecipeActivity extends Activity {
             childView.setAdapter(adapter);
             childView.setThreshold(1);
             if (s < r.ingredients.size()) {
-                childView.setText(r.ingredients.get(s));
+                childView.setText(r.ingredients.get(s).toString());
                 s++;
             }
 
@@ -129,14 +129,17 @@ public class EditRecipeActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<String> recipeIngredientList = new ArrayList<>();
+                ArrayList<Ingredient> recipeIngredientList = new ArrayList<>();
                 for (int i = 0; i < viewGroup.getChildCount(); i++) {
                     AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
                     String ingredient = childView.getText().toString().toLowerCase();
                     if (!ingredients.contains(ingredient)) {
                         ingredients.add(ingredient);
                     }
-                    recipeIngredientList.add(ingredient);
+                    if (ingredient == null || ingredient.length() == 0) {
+                        continue;
+                    }
+                    recipeIngredientList.add(new Ingredient(ingredient));
                 }
                 //save recipe object
                 String directionText = cookingDirection.getText().toString();

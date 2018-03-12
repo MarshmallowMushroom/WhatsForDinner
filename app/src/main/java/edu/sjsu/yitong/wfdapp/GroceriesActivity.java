@@ -3,14 +3,22 @@ package edu.sjsu.yitong.wfdapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Layout;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.daimajia.swipe.SwipeLayout;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,33 +28,75 @@ import java.util.Map;
 public class GroceriesActivity extends Activity {
 
     ListView listView;
-    // should load the ingredients from all recipes instead of ingredient arraylist
-    String ingredientFile = "new_dish_activity_ingredients.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grocery);
-        ArrayList<String> ingredients = readIngredientsFromFile();
+        TextView title = findViewById(R.id.groceryTitle);
+        int numMeals = 0;
+        Map<String, Integer> ingre = new HashMap<>();
+        Map<String, String> units = new HashMap<>();
+        for (String r :SharedRecipes.meals.keySet()) {
+            for (Ingredient i :SharedRecipes.recipes.get(r).ingredients) {
+                int amount = 0;
+                amount += i.amount * SharedRecipes.meals.get(r);
+                if (ingre.containsKey(i.name)) {
+                    ingre.put(i.name, ingre.get(i.name)+amount);
+                } else {
+                    ingre.put(i.name, amount);
+                    units.put(i.name, i.unit);
+                }
+            }
+            numMeals += SharedRecipes.meals.get(r);
+        }
+        title.setText("Grocery List for " + numMeals + " Meals");
 
-        listView = (ListView) findViewById(R.id.groceryList);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, ingredients);
-        listView.setAdapter(adapter);
-    }
+        listView = findViewById(R.id.groceryList);
+        LayoutInflater inflater = getLayoutInflater();
+        View list = inflater.inflate(R.layout.item_listview, listView, false);
+        SwipeLayout swipeLayout = list.findViewById(R.id.swipe_layout);
+        swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
+        swipeLayout.addDrag(SwipeLayout.DragEdge.Left, findViewById(R.id.bottom_wrapper));
 
-    private ArrayList<String> readIngredientsFromFile() {
-        ArrayList<String> savedArrayList = new ArrayList<>();
+        swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
+            @Override
+            public void onStartOpen(SwipeLayout layout) {
 
-        try {
-            FileInputStream inputStream = openFileInput(ingredientFile);
-            ObjectInputStream in = new ObjectInputStream(inputStream);
-            savedArrayList = (ArrayList<String>) in.readObject();
-            in.close();
-            inputStream.close();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            }
+
+            @Override
+            public void onOpen(SwipeLayout layout) {
+
+            }
+
+            @Override
+            public void onStartClose(SwipeLayout layout) {
+
+            }
+
+            @Override
+            public void onClose(SwipeLayout layout) {
+
+            }
+
+            @Override
+            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+
+            }
+
+            @Override
+            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+
+            }
+        });
+
+        List<String> adapterList = new ArrayList<>();
+        for (String i: ingre.keySet()) {
+            adapterList.add(i + " (" + ingre.get(i) + " " + units.get(i) + ")");
         }
 
-        return savedArrayList;
+        ListViewAdapter adapter = new ListViewAdapter(this, R.layout.item_listview, adapterList);
+        listView.setAdapter(adapter);
     }
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class SharedRecipes {
     public static String recipeFile = "new_dish_activity_recipes.txt";
-    public static Map<String, Recipe> recipes = new HashMap<>();
-    public static Map<String, Integer> meals = new HashMap<>();
+    public static String mealsFile = "new_dish_activity_meals.txt";
+    public static Map<String, Recipe> recipes = new HashMap<>(); //all recipes
+    public static Map<String, Integer> meals = new HashMap<>(); //all selected meals
 }

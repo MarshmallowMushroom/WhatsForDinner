@@ -46,9 +46,9 @@ public class NewDishActivity extends Activity {
         setContentView(R.layout.activity_newdish);
         // get ingredients from recipes
         for (Map.Entry<String,Recipe> entry : SharedRecipes.recipes.entrySet()) {
-            for (String i : entry.getValue().ingredients) {
-                if (!ingredients.contains(i)) {
-                    ingredients.add(i);
+            for (Ingredient i : entry.getValue().ingredients) {
+                if (!ingredients.contains(i.name)) {
+                    ingredients.add(i.name);
                 }
             }
         }
@@ -121,14 +121,17 @@ public class NewDishActivity extends Activity {
                     return;
                 }
 
-                ArrayList<String> recipeIngredientList = new ArrayList<>();
+                ArrayList<Ingredient> recipeIngredientList = new ArrayList<>();
                 for (int i = 0; i < viewGroup.getChildCount(); i++) {
                     AutoCompleteTextView childView = (AutoCompleteTextView) viewGroup.getChildAt(i);
                     String ingredient = childView.getText().toString().toLowerCase();
                     if (!ingredients.contains(ingredient)) {
                         ingredients.add(ingredient);
                     }
-                    recipeIngredientList.add(ingredient);
+                    if (ingredient == null || ingredient.length() == 0) {
+                        continue;
+                    }
+                    recipeIngredientList.add(new Ingredient(ingredient));
                 }
                 String directionText = cookingDirection.getText().toString();
                 if (bitmap == null) {

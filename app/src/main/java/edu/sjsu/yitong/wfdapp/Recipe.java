@@ -14,11 +14,11 @@ import java.util.ArrayList;
 
 public class Recipe implements Serializable{
     public String name;
-    public ArrayList<String> ingredients;
+    public ArrayList<Ingredient> ingredients;
     public String cookingDirection;
     public SerializableBitMap bitmap = new SerializableBitMap();
 
-    public Recipe(String name, Bitmap bitmap, ArrayList<String> ingredients, String cookingDirection) {
+    public Recipe(String name, Bitmap bitmap, ArrayList<Ingredient> ingredients, String cookingDirection) {
         this.name = name;
         this.ingredients = ingredients;
         this.cookingDirection = cookingDirection;
